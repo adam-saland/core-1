@@ -1866,6 +1866,11 @@ Window.registerWindowName = (identity) => {
     coreState.registerPendingWindowName(identity.uuid, identity.name);
 };
 
+Window.findInPage = (identity, text, options) => {
+    let browserWindow = getElectronBrowserWindow(identity, 'find in page for');
+    WebContents.findInPage(browserWindow.webContents, text, options);
+};
+
 function emitCloseEvents(identity) {
     const { uuid, name } = identity;
 

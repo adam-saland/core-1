@@ -15,7 +15,8 @@ export const webContentsApiMap = {
     'navigate-window-forward': navigateWindowForward,
     'stop-window-navigation': stopWindowNavigation,
     'reload-window': reloadWindow,
-    'set-zoom-level': setZoomLevel
+    'set-zoom-level': setZoomLevel,
+    'found-in-page': findInPage
 };
 export function init () {
     registerActionMap(webContentsApiMap, 'Window');
@@ -114,6 +115,15 @@ function setZoomLevel(identity: Identity, message: APIMessage, ack: Acker): void
     const browserWin = getElectronBrowserWindow(windowIdentity);
 
     WebContents.setZoomLevel(browserWin.webContents, level);
+    ack(successAck);
+}
+function findInPage(identity: Identity, message: APIMessage, ack: Acker): void {
+    const { payload } = message;
+    const { text, options } = payload;
+    const windowIdentity = getTargetWindowIdentity(payload);
+    const browserWin = getElectronBrowserWindow(windowIdentity);
+
+    WebContents.findInPage(browserWin.webContents, text, options);
     ack(successAck);
 }
 

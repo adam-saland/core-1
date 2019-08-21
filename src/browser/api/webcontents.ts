@@ -1,4 +1,5 @@
 import * as url from 'url';
+// import { FindInPageOptions } from 'electron';
 
 export function executeJavascript(webContents: Electron.WebContents, code: string, callback: (e: any, result: any) => void): void {
     webContents.executeJavaScript(code, true, (result) => {
@@ -60,6 +61,15 @@ export function setZoomLevel(webContents: Electron.WebContents, level: number) {
 export function stopNavigation(webContents: Electron.WebContents) {
     webContents.stop();
 }
+export function findInPage(webContents: Electron.WebContents, text: string, options: Object) {
+     webContents.findInPage(text, options);
+}
+
+// add createFindInPagePromise()
+
+// export function foundInPage(webContents: Electron.webContents) {
+//     const found webContents.send('found')
+// }
 
 function createNavigationEndPromise(webContents: Electron.WebContents): Promise<void> {
     return new Promise((resolve, reject) => {
