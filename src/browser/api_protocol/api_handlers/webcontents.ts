@@ -120,10 +120,10 @@ function setZoomLevel(identity: Identity, message: APIMessage, ack: Acker): void
 
 function findInPage(identity: Identity, message: APIMessage, ack: Acker) {
     const { payload } = message;
-    const { text, options, result} = payload;
+    const { text, options} = payload;
     const windowIdentity = getTargetWindowIdentity(payload);
     const browserWin = getElectronBrowserWindow(windowIdentity);
-    return WebContents.findInPage(browserWin.webContents, text, options, result);
+    return WebContents.findInPage(browserWin.webContents, text, options);
 }
 
 //If unknown window AND `errDesc` provided, throw error; otherwise return (possibly undefined) browser window ref.
