@@ -69,8 +69,8 @@ export function findInPage(webContents: Electron.WebContents, text: string, opti
                 resolve(result);
             }
         });
+        requestId = webContents.findInPage(text, options);
     });
-    requestId = webContents.findInPage(text, options);
 }
 
 // add createFindInPagePromise()
