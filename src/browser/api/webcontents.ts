@@ -62,7 +62,15 @@ export function stopNavigation(webContents: Electron.WebContents) {
     webContents.stop();
 }
 export function findInPage(webContents: Electron.WebContents, text: string, options: Object) {
-     webContents.findInPage(text, options);
+    let requestId: number;
+    return new Promise((resolve) => {
+        webContents.on('found-in-page', (event, result) => {
+            if (requestId === result.requestId) {
+                resolve(result);
+            }
+        });
+    });
+    requestId = webContents.findInPage(text, options);
 }
 
 // add createFindInPagePromise()
