@@ -54,6 +54,9 @@ function beforeSendHeadersHandler(details: RequestDetails, callback: (response: 
     let headerAdded: boolean = false;
 
     if (details.webContentsId/* details.renderProcessId && details.renderFrameId */) {
+        // tslint:disable-next-line: max-line-length
+        electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler: {\n\tid: ${details.id}\n\turl: ${details.url}\n\tmethod: ${details.method}\n\tresourceType: ${details.resourceType}\n\trequestHeaders: ${details.JSON.stringify(requestHeaders)}\n\trenderProcessId: ${details.renderProcessId}\n\trenderFrameId: ${details.renderFrameId}\n\twebContentsId: ${details.webContentsId}\n}`);
+
         const wc = webContents.fromId(details.webContentsId /* fromProcessAndFrameIds(details.renderProcessId, details.renderFrameId); */);
         if (wc) {
             electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler got webcontents ${wc.id}`);
