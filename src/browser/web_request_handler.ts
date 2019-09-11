@@ -23,6 +23,7 @@ interface RequestDetails {
     requestHeaders: any;
     renderProcessId?: number; // not set if the request is not associated with a window
     renderFrameId?: number;
+    webContentsId?: number;
 }
 
 // passed to callback of webRequest.onBeforeSendHeaders
@@ -52,8 +53,8 @@ function applyHeaders(requestHeaders: any, config: Shapes.WebRequestHeaderConfig
 function beforeSendHeadersHandler(details: RequestDetails, callback: (response: HeadersResponse) => void): void {
     let headerAdded: boolean = false;
 
-    if (details.renderProcessId && details.renderFrameId) {
-        const wc = webContents.fromProcessAndFrameIds(details.renderProcessId, details.renderFrameId);
+    if (details.webContentsId/* details.renderProcessId && details.renderFrameId */) {
+        const wc = webContents.fromId(details.webContentsId /* fromProcessAndFrameIds(details.renderProcessId, details.renderFrameId); */);
         if (wc) {
             electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler got webcontents ${wc.id}`);
             const bw = wc.getOwnerBrowserWindow();
