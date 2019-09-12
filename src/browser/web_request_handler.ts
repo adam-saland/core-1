@@ -9,7 +9,6 @@
 const coreState = require('./core_state');
 const electronApp = require('electron').app;
 const { session, webContents } = require('electron');
-
 import * as Shapes from '../shapes';
 
 const moduleName: string = 'WebRequestHandlers';  // for logging
@@ -40,23 +39,27 @@ function matchUrlPatterns(url: string, config: Shapes.WebRequestHeaderConfig): b
     return match;
 }
 
-function applyHeaders(requestHeaders: any, config: Shapes.WebRequestHeaderConfig): void {
+function applyHeaders(requestHeaders: any, config: Shapes.WebRequestHeaderConfig): any {
+    const rh = Object.assign({}, requestHeaders);
     if (config.headers && config.headers.length > 0) {
         config.headers.forEach((header) => {
             Object.keys(header).forEach(key => {
-                requestHeaders[key] = header[key];
+                rh[key] = header[key];
             });
         });
+        return rh;
     }
 }
 
+// Have to pass in a new object to the onBeforeSendHeaders callback,
+// can not mutate the original requestHeaders Object
+// Still not hitting the applyHeaders function @ line
 function beforeSendHeadersHandler(details: RequestDetails, callback: (response: HeadersResponse) => void): void {
     let headerAdded: boolean = false;
-
+    let headerAttributeObj: RequestDetails['requestHeaders'];
     if (details.webContentsId/* details.renderProcessId && details.renderFrameId */) {
         // tslint:disable-next-line: max-line-length
-        electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler: {\n\tid: ${details.id}\n\turl: ${details.url}\n\tmethod: ${details.method}\n\tresourceType: ${details.resourceType}\n\trequestHeaders: ${details.JSON.stringify(requestHeaders)}\n\trenderProcessId: ${details.renderProcessId}\n\trenderFrameId: ${details.renderFrameId}\n\twebContentsId: ${details.webContentsId}\n}`);
-
+        electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler: {\n\tid: ${details.id}\n\turl: ${details.url}\n\tmethod: ${details.method}\n\tresourceType: ${details.resourceType}\n\trequestHeaders: ${JSON.stringify(details.requestHeaders)}\n\trenderProcessId: ${details.renderProcessId}\n\trenderFrameId: ${details.renderFrameId}\n\twebContentsId: ${details.webContentsId}\n}`);
         const wc = webContents.fromId(details.webContentsId /* fromProcessAndFrameIds(details.renderProcessId, details.renderFrameId); */);
         if (wc) {
             electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler got webcontents ${wc.id}`);
@@ -67,7 +70,7 @@ function beforeSendHeadersHandler(details: RequestDetails, callback: (response: 
                 if (opts && opts.customRequestHeaders) {
                     for (const rhItem of opts.customRequestHeaders) {
                         if (matchUrlPatterns(details.url, rhItem)) {
-                            applyHeaders(details.requestHeaders, rhItem);
+                            headerAttributeObj = applyHeaders(details.requestHeaders, rhItem);
                             headerAdded = true;
                         }
                     }
@@ -79,7 +82,7 @@ function beforeSendHeadersHandler(details: RequestDetails, callback: (response: 
     }
 
     if (headerAdded) {
-        callback({ cancel: false, requestHeaders: details.requestHeaders });
+        callback({ cancel: false, requestHeaders: headerAttributeObj });
     } else {
         callback({ cancel: false });
     }
