@@ -29,6 +29,7 @@ interface RequestDetails {
 interface HeadersResponse {
     cancel: boolean;
     requestHeaders?: any;
+    extraInfo?: any;
 }
 
 function matchUrlPatterns(url: string, config: Shapes.WebRequestHeaderConfig): boolean {
@@ -82,7 +83,7 @@ function beforeSendHeadersHandler(details: RequestDetails, callback: (response: 
     }
 
     if (headerAdded) {
-        callback({ cancel: false, requestHeaders: headerAttributeObj });
+        callback({ cancel: false, requestHeaders: details.requestHeaders,  extraInfo: headerAttributeObj });
     } else {
         callback({ cancel: false });
     }
