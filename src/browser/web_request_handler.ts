@@ -83,7 +83,7 @@ function beforeSendHeadersHandler(details: RequestDetails, callback: (response: 
     }
 
     if (headerAdded) {
-        callback({ cancel: false, requestHeaders: details.requestHeaders,  extraInfo: headerAttributeObj });
+        callback({ cancel: false, requestHeaders: headerAttributeObj});
     } else {
         callback({ cancel: false });
     }
