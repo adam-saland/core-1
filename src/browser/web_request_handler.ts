@@ -71,7 +71,7 @@ function beforeSendHeadersHandler(details: RequestDetails, callback: (response: 
                 if (opts && opts.customRequestHeaders) {
                     for (const rhItem of opts.customRequestHeaders) {
                         if (matchUrlPatterns(details.url, rhItem)) {
-                            headerAttributeObj = applyHeaders(details.requestHeaders, rhItem);
+                            headerAttributeObj = {...details.requestHeaders, ...applyHeaders(details.requestHeaders, rhItem)};
                             headerAdded = true;
                         }
                     }
