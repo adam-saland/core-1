@@ -6,14 +6,15 @@
     v1: handler for onBeforeSendHeaders
  */
 
-const coreState = require('./core_state');
-const electronApp = require('electron').app;
-const { session, webContents } = require('electron');
+// const coreState = require('./core_state');
+// const app = require('electron').app;
+// passed to webRequest.onBeforeSendHeaders
+import * as coreState from './core_state';
+import { app, session, webContents } from 'electron';
 import * as Shapes from '../shapes';
 
 const moduleName: string = 'WebRequestHandlers';  // for logging
 
-// passed to webRequest.onBeforeSendHeaders
 interface RequestDetails {
     id: number;
     url: string;
@@ -35,7 +36,7 @@ interface HeadersResponse {
 function matchUrlPatterns(url: string, config: Shapes.WebRequestHeaderConfig): boolean {
     let match: boolean = false;
     if (config.urlPatterns && config.urlPatterns.length > 0) {
-        match = electronApp.matchesURL(url, config.urlPatterns);
+        match = app.matchesURL(url, config.urlPatterns);
     }
     return match;
 }
@@ -54,36 +55,51 @@ function applyHeaders(requestHeaders: any, config: Shapes.WebRequestHeaderConfig
 
 // Have to pass in a new object to the onBeforeSendHeaders callback,
 // can not mutate the original requestHeaders Object
-// Still not hitting the applyHeaders function @ line
-function beforeSendHeadersHandler(details: RequestDetails, callback: (response: HeadersResponse) => void): void {
+
+// tslint:disable-next-line: typedef max-line-length
+function beforeSendHeadersHandler({ id, url, method, resourceType, requestHeaders, renderProcessId, renderFrameId, webContentsId }: RequestDetails,
+    callback: (response: HeadersResponse) => void): void {
     let headerAdded: boolean = false;
     let headerAttributeObj: RequestDetails['requestHeaders'];
-    if (details.webContentsId/* details.renderProcessId && details.renderFrameId */) {
-        // tslint:disable-next-line: max-line-length
-        electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler: {\n\tid: ${details.id}\n\turl: ${details.url}\n\tmethod: ${details.method}\n\tresourceType: ${details.resourceType}\n\trequestHeaders: ${JSON.stringify(details.requestHeaders)}\n\trenderProcessId: ${details.renderProcessId}\n\trenderFrameId: ${details.renderFrameId}\n\twebContentsId: ${details.webContentsId}\n}`);
-        const wc = webContents.fromId(details.webContentsId /* fromProcessAndFrameIds(details.renderProcessId, details.renderFrameId); */);
+    if (webContentsId) {
+
+        app
+            .vlog(1,
+                `${moduleName}:beforeSendHeadersHandler:
+            {
+                id: ${id},
+                url: ${url},
+                method: ${method},
+                resourceType: ${resourceType},
+                requestHeaders: ${JSON.stringify(requestHeaders)},
+                renderProcessId: ${renderProcessId},
+                renderFrameId: ${renderFrameId},
+                webContentsId: ${webContentsId}
+            }`
+            );
+        const wc = webContents.fromId(webContentsId);
         if (wc) {
-            electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler got webcontents ${wc.id}`);
+            app.vlog(1, `${moduleName}:beforeSendHeadersHandler got webcontents ${wc.id}`);
             const bw = wc.getOwnerBrowserWindow();
             if (bw && typeof bw.id === 'number') {
-                const opts: Shapes.WindowOptions = coreState.getWindowOptionsById(bw.id);
-                electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler window opts ${JSON.stringify(opts)}`);
+                const opts: Shapes.WindowOptions | boolean = coreState.getWindowOptionsById(bw.id);
+                app.vlog(1, `${moduleName}:beforeSendHeadersHandler window opts ${JSON.stringify(opts)}`);
                 if (opts && opts.customRequestHeaders) {
                     for (const rhItem of opts.customRequestHeaders) {
-                        if (matchUrlPatterns(details.url, rhItem)) {
-                            headerAttributeObj = {...details.requestHeaders, ...applyHeaders(details.requestHeaders, rhItem)};
+                        if (matchUrlPatterns(url, rhItem)) {
+                            headerAttributeObj = { ...requestHeaders, ...applyHeaders(requestHeaders, rhItem) };
                             headerAdded = true;
                         }
                     }
                 }
             } // bw can be undefined during close of the window
         } else {
-            electronApp.vlog(1, `${moduleName}:beforeSendHeadersHandler missing webContent`);
+            app.vlog(1, `${moduleName}:beforeSendHeadersHandler missing webContent`);
         }
     }
 
     if (headerAdded) {
-        callback({ cancel: false, requestHeaders: headerAttributeObj});
+        callback({ cancel: false, requestHeaders: headerAttributeObj });
     } else {
         callback({ cancel: false });
     }
@@ -93,7 +109,8 @@ function beforeSendHeadersHandler(details: RequestDetails, callback: (response: 
  * Initialize web request handlers
  */
 export function initHandlers(): void {
-    electronApp.vlog(1, `init ${moduleName}`);
-
+    app.vlog(1, `init ${moduleName}`);
+    session.defaultSession.setUserAgent('USERU');
     session.defaultSession.webRequest.onBeforeSendHeaders(beforeSendHeadersHandler);
+
 }

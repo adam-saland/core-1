@@ -477,9 +477,9 @@ export function deleteApp(uuid: string): void {
     apps = apps.filter(app => app.uuid !== uuid);
 }
 
-export function getWindowOptionsById(id: number): Shapes.WindowOptions|boolean {
+export function getWindowOptionsById(id: number): Shapes.WindowOptions {
     const win = getWinById(id);
-    return win && win.openfinWindow && win.openfinWindow._options;
+    if (win && win.openfinWindow && win.openfinWindow._options) { return win.openfinWindow._options; }
 }
 
 export function getMainWindowOptions(id: number): Shapes.WindowOptions|void {
