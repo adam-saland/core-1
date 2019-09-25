@@ -259,6 +259,10 @@ export const convertToElectron = function(options, returnAsString) {
         newOptions.message = options.message;
     }
 
+    if (options.customRequestHeaders !== undefined) {
+        newOptions.customRequestHeaders = options.customRequestHeaders;
+    }
+
     if (options.customData !== undefined) {
         newOptions.customData = options.customData;
     }

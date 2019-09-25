@@ -159,6 +159,9 @@ let optionSetters = {
         browserWin.setMenu(null);
         browserWin.webContents.updateContextMenuSettings(val);
     },
+    customRequestHeaders: function(newVal, browserWin) {
+        setOptOnBrowserWin('customRequestHeaders', newVal, browserWin);
+    },
     customData: function(newVal, browserWin) {
         setOptOnBrowserWin('customData', newVal, browserWin);
     },

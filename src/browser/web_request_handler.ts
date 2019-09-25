@@ -1,4 +1,3 @@
-
 /*
     Intercept and modify the contents of a request at various stages of its lifetime, based on
     https://github.com/openfin/runtime/blob/develop/docs/api/web-request.md
@@ -6,9 +5,6 @@
     v1: handler for onBeforeSendHeaders
  */
 
-// const coreState = require('./core_state');
-// const app = require('electron').app;
-// passed to webRequest.onBeforeSendHeaders
 import * as coreState from './core_state';
 import { app, session, webContents } from 'electron';
 import * as Shapes from '../shapes';
@@ -54,10 +50,17 @@ function applyHeaders(requestHeaders: any, config: Shapes.WebRequestHeaderConfig
 }
 
 // Have to pass in a new object to the onBeforeSendHeaders callback,
-// can not mutate the original requestHeaders Object
-
-// tslint:disable-next-line: typedef max-line-length
-function beforeSendHeadersHandler({ id, url, method, resourceType, requestHeaders, renderProcessId, renderFrameId, webContentsId }: RequestDetails,
+// Can not mutate the original requestHeaders Object
+function beforeSendHeadersHandler({
+        id,
+        url,
+        method,
+        resourceType,
+        requestHeaders,
+        renderProcessId,
+        renderFrameId,
+        webContentsId
+    }: RequestDetails,
     callback: (response: HeadersResponse) => void): void {
     let headerAdded: boolean = false;
     let headerAttributeObj: RequestDetails['requestHeaders'];
@@ -78,11 +81,11 @@ function beforeSendHeadersHandler({ id, url, method, resourceType, requestHeader
             }`
             );
         const wc = webContents.fromId(webContentsId);
-        if (wc) {
+        // if (wc) {
             app.vlog(1, `${moduleName}:beforeSendHeadersHandler got webcontents ${wc.id}`);
             const bw = wc.getOwnerBrowserWindow();
             if (bw && typeof bw.id === 'number') {
-                const opts: Shapes.WindowOptions | boolean = coreState.getWindowOptionsById(bw.id);
+                const opts: Shapes.WindowOptions | any = coreState.getMainWindowOptions(bw.id);
                 app.vlog(1, `${moduleName}:beforeSendHeadersHandler window opts ${JSON.stringify(opts)}`);
                 if (opts && opts.customRequestHeaders) {
                     for (const rhItem of opts.customRequestHeaders) {
@@ -92,8 +95,7 @@ function beforeSendHeadersHandler({ id, url, method, resourceType, requestHeader
                         }
                     }
                 }
-            } // bw can be undefined during close of the window
-        } else {
+            } else {
             app.vlog(1, `${moduleName}:beforeSendHeadersHandler missing webContent`);
         }
     }
@@ -105,9 +107,7 @@ function beforeSendHeadersHandler({ id, url, method, resourceType, requestHeader
     }
 }
 
-/**
- * Initialize web request handlers
- */
+// Initialize web request handlers
 export function initHandlers(): void {
     app.vlog(1, `init ${moduleName}`);
     session.defaultSession.setUserAgent('USERU');

@@ -482,7 +482,7 @@ export function getWindowOptionsById(id: number): Shapes.WindowOptions {
     if (win && win.openfinWindow && win.openfinWindow._options) { return win.openfinWindow._options; }
 }
 
-export function getMainWindowOptions(id: number): Shapes.WindowOptions|void {
+export function getMainWindowOptions(id: number): Shapes.WindowOptions|boolean {
     const app = getAppByWin(id);
 
     if (!app) {

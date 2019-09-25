@@ -188,8 +188,8 @@ export interface WindowOptions extends WebOptions {
         height: number;
         width: number;
     };
-    customData?: string;
     customRequestHeaders?: WebRequestHeaderConfig[];
+    customData?: string;
     defaultCentered?: boolean;
     defaultHeight?: number;
     defaultLeft?: number;
