@@ -52,15 +52,15 @@ function applyHeaders(requestHeaders: any, config: Shapes.WebRequestHeaderConfig
 // Have to pass in a new object to the onBeforeSendHeaders callback,
 // Can not mutate the original requestHeaders RequestDetails Object
 function beforeSendHeadersHandler({
-        id,
-        url,
-        method,
-        resourceType,
-        requestHeaders,
-        renderProcessId,
-        renderFrameId,
-        webContentsId
-    }: RequestDetails,
+    id,
+    url,
+    method,
+    resourceType,
+    requestHeaders,
+    renderProcessId,
+    renderFrameId,
+    webContentsId
+}: RequestDetails,
     callback: (response: HeadersResponse) => void): void {
     let headerAdded: boolean = false;
     let headerAttributeObj: RequestDetails['requestHeaders'];
@@ -80,20 +80,20 @@ function beforeSendHeadersHandler({
             }`
             );
         const wc = webContents.fromId(webContentsId);
-            app.vlog(1, `${moduleName}:beforeSendHeadersHandler got webcontents ${wc.id}`);
-            const bw = wc.getOwnerBrowserWindow();
-            if (bw && typeof bw.id === 'number') {
-                const opts: Shapes.WindowOptions | any = coreState.getMainWindowOptions(bw.id);
-                app.vlog(1, `${moduleName}:beforeSendHeadersHandler window opts ${JSON.stringify(opts)}`);
-                if (opts && opts.customRequestHeaders) {
-                    for (const rhItem of opts.customRequestHeaders) {
-                        if (matchUrlPatterns(url, rhItem)) {
-                            headerAttributeObj = { ...requestHeaders, ...applyHeaders(requestHeaders, rhItem) };
-                            headerAdded = true;
-                        }
+        app.vlog(1, `${moduleName}:beforeSendHeadersHandler got webcontents ${wc.id}`);
+        const bw = wc.getOwnerBrowserWindow();
+        if (bw && typeof bw.id === 'number') {
+            const opts: Shapes.WindowOptions | any = coreState.getMainWindowOptions(bw.id);
+            app.vlog(1, `${moduleName}:beforeSendHeadersHandler window opts ${JSON.stringify(opts)}`);
+            if (opts && opts.customRequestHeaders) {
+                for (const rhItem of opts.customRequestHeaders) {
+                    if (matchUrlPatterns(url, rhItem)) {
+                        headerAttributeObj = { ...requestHeaders, ...applyHeaders(requestHeaders, rhItem) };
+                        headerAdded = true;
                     }
                 }
-            } else {
+            }
+        } else {
             app.vlog(1, `${moduleName}:beforeSendHeadersHandler missing webContent`);
         }
     }

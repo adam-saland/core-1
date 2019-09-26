@@ -275,7 +275,7 @@ export const convertToElectron = function(options, returnAsString) {
         newOptions.preloadScripts = this.normalizePreloadScripts(options);
     }
 
-    if (options.customRequestHeaders !== undefined) {
+    if (options.customRequestHeaders !== undefined || 'customRequestHeaders' in options) {
         newOptions.customRequestHeaders = options.customRequestHeaders;
     }
 
