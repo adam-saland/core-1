@@ -50,7 +50,7 @@ function applyHeaders(requestHeaders: any, config: Shapes.WebRequestHeaderConfig
 }
 
 // Have to pass in a new object to the onBeforeSendHeaders callback,
-// Can not mutate the original requestHeaders Object
+// Can not mutate the original requestHeaders RequestDetails Object
 function beforeSendHeadersHandler({
         id,
         url,
@@ -65,7 +65,6 @@ function beforeSendHeadersHandler({
     let headerAdded: boolean = false;
     let headerAttributeObj: RequestDetails['requestHeaders'];
     if (webContentsId) {
-
         app
             .vlog(1,
                 `${moduleName}:beforeSendHeadersHandler:
@@ -81,7 +80,6 @@ function beforeSendHeadersHandler({
             }`
             );
         const wc = webContents.fromId(webContentsId);
-        // if (wc) {
             app.vlog(1, `${moduleName}:beforeSendHeadersHandler got webcontents ${wc.id}`);
             const bw = wc.getOwnerBrowserWindow();
             if (bw && typeof bw.id === 'number') {
@@ -110,7 +108,5 @@ function beforeSendHeadersHandler({
 // Initialize web request handlers
 export function initHandlers(): void {
     app.vlog(1, `init ${moduleName}`);
-    session.defaultSession.setUserAgent('USERU');
     session.defaultSession.webRequest.onBeforeSendHeaders(beforeSendHeadersHandler);
-
 }
