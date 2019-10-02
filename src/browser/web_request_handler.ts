@@ -29,18 +29,18 @@ interface HeadersResponse {
     extraInfo?: any;
 }
 
-function matchUrlPatterns(url: string, config: Shapes.WebRequestHeaderConfig): boolean {
+function matchUrlPatterns(url: string, {urlPatterns}: Shapes.WebRequestHeaderConfig): boolean {
     let match: boolean = false;
-    if (config.urlPatterns && config.urlPatterns.length > 0) {
-        match = app.matchesURL(url, config.urlPatterns);
+    if (urlPatterns && urlPatterns.length > 0) {
+        match = app.matchesURL(url, urlPatterns);
     }
     return match;
 }
 
-function applyHeaders(requestHeaders: any, config: Shapes.WebRequestHeaderConfig): any {
+function applyHeaders(requestHeaders: any, {headers}: Shapes.WebRequestHeaderConfig): any {
     const rh = Object.assign({}, requestHeaders);
-    if (config.headers && config.headers.length > 0) {
-        config.headers.forEach((header) => {
+    if (headers && headers.length > 0) {
+        headers.forEach((header) => {
             Object.keys(header).forEach(key => {
                 rh[key] = header[key];
             });
