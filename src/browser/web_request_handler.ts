@@ -106,6 +106,7 @@ function beforeSendHeadersHandler({
 }
 
 // Initialize web request handlers
+// Provisional headers are shown when service worker is enabled.
 export function initHandlers(): void {
     app.vlog(1, `init ${moduleName}`);
     session.defaultSession.webRequest.onBeforeSendHeaders(beforeSendHeadersHandler);
