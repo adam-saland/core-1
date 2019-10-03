@@ -61,6 +61,21 @@ export function setZoomLevel(webContents: Electron.WebContents, level: number) {
 export function stopNavigation(webContents: Electron.WebContents) {
     webContents.stop();
 }
+
+/*
+    Each subsequent call to the findInPage Event such that:
+    result.matches > 0 && result.activeOrdinal < result.matches
+    will return the next match found:
+    w = fin.Window.getCurrentSync();
+    w.findInpage('something'); => result.matches = 1 || not found
+    if found:
+        w.findInPage('something'); => result.matches = 2,
+        w.findInPage('something'); => result.matches = 3,
+        ...
+        w.findInPage('something'); => result.matches = n - 1,
+    if called again where result.matches = n - 1
+    then w.findInPage('something'); => result.matches = 1,
+*/
 export function findInPage(webContents: Electron.WebContents, text: string, options: Object) {
     let requestId: number;
     return new Promise((resolve) => {
@@ -72,12 +87,6 @@ export function findInPage(webContents: Electron.WebContents, text: string, opti
         requestId = webContents.findInPage(text, options);
     });
 }
-
-// add createFindInPagePromise()
-
-// export function foundInPage(webContents: Electron.webContents) {
-//     const found webContents.send('found')
-// }
 
 function createNavigationEndPromise(webContents: Electron.WebContents): Promise<void> {
     return new Promise((resolve, reject) => {
