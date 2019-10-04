@@ -75,6 +75,8 @@ export function stopNavigation(webContents: Electron.WebContents) {
         w.findInPage('something'); => result.matches = n - 1,
     if called again where result.matches = n - 1
     then w.findInPage('something'); => result.matches = 1,
+    after loop back to initial activeOrdinalMatch calls twice
+    on initial activalOrdinal before findNext: true
 */
 export function findInPage(webContents: Electron.WebContents, text: string, options: Object) {
     let requestId: number;
@@ -86,6 +88,12 @@ export function findInPage(webContents: Electron.WebContents, text: string, opti
         });
         requestId = webContents.findInPage(text, options);
     });
+}
+
+// create stopFindInPage clear selection | keep selection | activate selection
+
+export function stopFindInPage(webContents: Electron.WebContents, action: 'clearSelection' | 'keepSelection' | 'activateSelection') {
+    webContents.stopFindInPage(action);
 }
 
 function createNavigationEndPromise(webContents: Electron.WebContents): Promise<void> {
