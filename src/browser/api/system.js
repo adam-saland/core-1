@@ -468,11 +468,12 @@ export const System = {
         const { port, securityRealm, version } =
         portDiscovery.getPortInfoByArgs(coreState.argo, socketServer.getPort());
         const manifestUrl = coreState.getConfigUrlByUuid(identity.uuid);
+        const chromiumVersion = process.versions.chrome;
         const architecture = process.arch;
         const cachePath = electronApp.getPath('userData');
         const args = Object.assign({}, coreState.argo);
         args._ = undefined;
-        return { manifestUrl, port, securityRealm, version, architecture, cachePath, args };
+        return { manifestUrl, port, securityRealm, version, architecture, cachePath, chromiumVersion, args };
     },
     getRvmInfo: function(identity, callback, errorCallback) {
         let appObject = coreState.getAppObjByUuid(identity.uuid);
